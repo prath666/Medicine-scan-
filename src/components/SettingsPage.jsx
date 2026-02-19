@@ -137,7 +137,7 @@ const SettingsPage = ({ onBack }) => {
                         </div>
                         <div className="flex flex-col items-start">
                             <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Instagram</span>
-                            <span className="text-xs text-slate-400">@prath666</span>
+                            <span className="text-xs text-slate-400">@flowdev_9</span>
                         </div>
                         <ExternalLink size={16} className="ml-auto text-slate-300 dark:text-slate-600" />
                     </a>
