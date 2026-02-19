@@ -147,7 +147,7 @@ const LiveBackground = () => {
         };
     }, []);
 
-    return <canvas ref={canvasRef} className="fixed inset-0 -z-20 pointer-events-none opacity-60" />;
+    return <canvas ref={canvasRef} className="fixed inset-0 -z-20 pointer-events-none opacity-30" />;
 };
 
 export default LiveBackground;

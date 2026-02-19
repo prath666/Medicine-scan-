@@ -4,9 +4,8 @@ import LiveBackground from './components/LiveBackground';
 import MedicineSearch from './components/MedicineSearch';
 import MedicineDetails from './components/MedicineDetails';
 import MedicineNotFound from './components/MedicineNotFound';
-import ThemeToggle from './components/ThemeToggle';
-import TopBar from './components/TopBar';
 import BottomNav from './components/BottomNav';
+import SettingsPage from './components/SettingsPage';
 import { fetchMedicineDetails } from './services/groqService';
 import ScanPage from './components/ScanPage';
 import './App.css';
@@ -22,7 +21,6 @@ function App() {
     setSearchedTerm(query);
     setIsLoading(true);
     setSearchStatus('LOADING');
-    // Ensure we switch to home if searching from another tab
     setActiveTab('home');
 
     try {
@@ -50,7 +48,6 @@ function App() {
     setIsLoading(false);
   };
 
-  // Dedicated Scan Handler
   const handleScanComplete = (medicineName) => {
     setActiveTab('home');
     handleSearch(medicineName);
@@ -63,14 +60,14 @@ function App() {
 
       <LiveBackground />
 
-      <ThemeToggle />
-
-      {/* Render Scan Page Full Screen if Active */}
+      {/* Render based on active tab */}
       {activeTab === 'scan' ? (
         <ScanPage
           onScanComplete={handleScanComplete}
           onBack={() => setActiveTab('home')}
         />
+      ) : activeTab === 'settings' ? (
+        <SettingsPage onBack={() => setActiveTab('home')} />
       ) : (
         /* Home / Search View */
         <>
@@ -85,7 +82,7 @@ function App() {
 
                 {!isLoading && (
                   <>
-                    {/* Clean Home Screen - No other elements per user request */}
+                    {/* Clean Home Screen */}
                   </>
                 )}
               </div>
@@ -94,15 +91,15 @@ function App() {
         </>
       )}
 
-      {/* Results View (Only show if NOT scanning) */}
-      {activeTab !== 'scan' && searchStatus === 'FOUND' && selectedMedicine && (
+      {/* Results View */}
+      {activeTab !== 'scan' && activeTab !== 'settings' && searchStatus === 'FOUND' && selectedMedicine && (
         <MedicineDetails
           data={selectedMedicine}
           onBack={resetSearch}
         />
       )}
 
-      {activeTab !== 'scan' && searchStatus === 'NOT_FOUND' && (
+      {activeTab !== 'scan' && activeTab !== 'settings' && searchStatus === 'NOT_FOUND' && (
         <div className="min-h-[60vh] flex items-center justify-center">
           <MedicineNotFound
             searchedTerm={searchedTerm}
@@ -111,11 +108,9 @@ function App() {
         </div>
       )}
 
-      {/* Mobile Bottom Nav - Always visible */}
-      {activeTab !== 'scan' && (
-        <div className="md:hidden">
-          <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-        </div>
+      {/* Bottom Nav - Show on home, settings, not_found. Hide on scan and details */}
+      {activeTab !== 'scan' && !(searchStatus === 'FOUND' && selectedMedicine) && (
+        <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
       )}
     </div>
   );
