@@ -19,7 +19,9 @@ const callGeminiFunction = async (prompt, imagePart = null) => {
         });
 
         if (!response.ok) {
-            throw new Error(`Netlify Function failed: ${response.statusText}`);
+            const errorBody = await response.text();
+            console.error("🔥 Server Error Response:", errorBody);
+            throw new Error(`Netlify Function failed (${response.status}): ${errorBody}`);
         }
 
         const data = await response.json();
