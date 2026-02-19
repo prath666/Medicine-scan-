@@ -73,33 +73,25 @@ function App() {
         />
       ) : (
         /* Home / Search View */
-        <div className="pb-24 md:pb-0 md:pt-10">
-          {/* Mobile Top Bar */}
-          <div className="md:hidden">
-            <TopBar />
-          </div>
+        <>
+          {(searchStatus === 'IDLE' || searchStatus === 'LOADING') && (
+            <div className="pb-24 md:pb-0 md:pt-10">
+              <div className="flex flex-col min-h-[80vh] w-full max-w-md mx-auto md:max-w-4xl">
+                <HeroSection />
 
-          {searchStatus === 'IDLE' || searchStatus === 'LOADING' ? (
-            <div className="flex flex-col min-h-[80vh] w-full max-w-md mx-auto md:max-w-4xl">
-              <HeroSection />
+                <div className="-mt-2 mb-6">
+                  <MedicineSearch onSearch={handleSearch} isLoading={isLoading} />
+                </div>
 
-              <div className="-mt-2 mb-6">
-                <MedicineSearch onSearch={handleSearch} isLoading={isLoading} />
+                {!isLoading && (
+                  <>
+                    {/* Clean Home Screen - No other elements per user request */}
+                  </>
+                )}
               </div>
-
-              {!isLoading && (
-                <>
-                  {/* Clean Home Screen - No other elements per user request */}
-                </>
-              )}
             </div>
-          ) : null}
-
-          {/* Mobile Bottom Nav */}
-          <div className="md:hidden">
-            <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-          </div>
-        </div>
+          )}
+        </>
       )}
 
       {/* Results View (Only show if NOT scanning) */}
@@ -116,6 +108,13 @@ function App() {
             searchedTerm={searchedTerm}
             onRetry={resetSearch}
           />
+        </div>
+      )}
+
+      {/* Mobile Bottom Nav - Always visible */}
+      {activeTab !== 'scan' && (
+        <div className="md:hidden">
+          <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
       )}
     </div>

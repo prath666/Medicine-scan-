@@ -256,9 +256,8 @@ const MedicineSearch = ({ onSearch, isLoading }) => {
 
             {/* Tip */}
             {!showSuggestions && (
-                <div className="text-center mt-4 flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-medium animate-fade-in-up">
-                    <Camera size={14} />
-                    <span>Powered by Groq AI • Type to see suggestions</span>
+                <div className="text-center mt-4 text-slate-400 dark:text-slate-500 text-xs font-medium animate-fade-in-up">
+                    Scan or type a medicine name to get instant details
                 </div>
             )}
         </div>

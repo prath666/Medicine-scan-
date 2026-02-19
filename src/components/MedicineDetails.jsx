@@ -88,7 +88,7 @@ const MedicineDetails = ({ data, onBack }) => {
   const currentLang = LANGUAGES.find(l => l.code === selectedLanguage) || LANGUAGES[0];
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10 animate-fade-in-up font-sans relative">
+    <div className="max-w-4xl mx-auto px-6 pt-0 pb-10 animate-fade-in-up font-sans relative">
       {/* Translation Loading Overlay */}
       {isTranslating && (
         <div className="fixed inset-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
@@ -102,7 +102,7 @@ const MedicineDetails = ({ data, onBack }) => {
       )}
 
       {/* Top Bar: Back + Language Selector */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-4 pt-1">
         <button
           onClick={onBack}
           className="flex items-center text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors group"
