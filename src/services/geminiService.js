@@ -1,17 +1,34 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// Removed direct Gemini SDK import to secure API key
+// import { GoogleGenerativeAI } from "@google/generative-ai";
 
-if (!GEMINI_API_KEY) {
-    console.error("❌ Missing VITE_GEMINI_API_KEY in .env file!");
-} else {
-    console.log("✅ Gemini API Key loaded successfully");
-}
+/**
+ * Helper to call Netlify Function
+ */
+const callGeminiFunction = async (prompt, imagePart = null) => {
+    try {
+        const response = await fetch('/.netlify/functions/gemini', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt,
+                image: imagePart // Optional image data
+            }),
+        });
 
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+        if (!response.ok) {
+            throw new Error(`Netlify Function failed: ${response.statusText}`);
+        }
 
-// Using latest stable Gemini 2.5 Flash model
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const data = await response.json();
+        return data.text;
+    } catch (error) {
+        console.error("Gemini Function Error:", error);
+        throw error;
+    }
+};
 
 /**
  * Translates medicine details JSON into the target language using Gemini Flash.
@@ -22,11 +39,6 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 export const translateMedicineDetails = async (medicineData, targetLanguage) => {
     if (!medicineData || !targetLanguage || targetLanguage === 'English') {
         return medicineData;
-    }
-
-    if (!GEMINI_API_KEY) {
-        console.error("❌ Cannot translate: No Gemini API key found");
-        return null;
     }
 
     console.log(`🌐 Translating to ${targetLanguage}...`);
@@ -46,8 +58,7 @@ IMPORTANT RULES:
 Here is the medicine data to translate:
 ${JSON.stringify(medicineData, null, 2)}`;
 
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
+        const responseText = await callGeminiFunction(prompt);
 
         console.log("📝 Raw Gemini response:", responseText.substring(0, 200) + "...");
 
@@ -67,12 +78,10 @@ ${JSON.stringify(medicineData, null, 2)}`;
     } catch (error) {
         console.error("❌ Gemini Translation Error:", error);
         console.error("Error details:", error?.message);
-        if (error?.response) {
-            console.error("API Response:", error.response);
-        }
         return null;
     }
 };
+
 // Fallback function to fetch medicine details if Groq fails
 export const fetchMedicineDetailsFromGemini = async (medicineName) => {
     if (!medicineName) return null;
@@ -104,8 +113,7 @@ RULES:
 2. If medicine not found, return {"error": true}.
 3. "substitutes" should be Indian brands if available.`;
 
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
+        const responseText = await callGeminiFunction(prompt);
 
         // Clean up response
         const cleanedText = responseText
@@ -123,3 +131,4 @@ RULES:
         return null;
     }
 };
+
