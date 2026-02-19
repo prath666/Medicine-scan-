@@ -1,8 +1,11 @@
 
 import Groq from "groq-sdk";
 
+// Fallback to VITE_ prefixed key if the standard one is missing
+const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
+
 const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY,
+    apiKey: apiKey,
 });
 
 export const handler = async (event) => {
