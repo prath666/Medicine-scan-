@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Camera, Loader2, Upload, ScanLine, Sparkles, X } from 'lucide-react';
 import { processImageOCR } from '../utils/ocrProcessor';
-import { fetchSuggestions, extractMedicineName } from '../services/groqService';
-
+import { fetchSuggestions } from '../services/groqService';
 const MedicineSearch = ({ onSearch, isLoading }) => {
     const [query, setQuery] = useState('');
     const [suggestions, setSuggestions] = useState([]);
@@ -60,28 +59,15 @@ const MedicineSearch = ({ onSearch, isLoading }) => {
     const processFile = async (file) => {
         setIsProcessing(true);
         try {
-            // 1. Get Raw Text from Tesseract
-            const rawText = await processImageOCR(file);
-            console.log("Raw OCR Text:", rawText);
-
-            if (!rawText || rawText.length < 3) {
-                alert("Could not read text. Try again.");
-                return;
-            }
-
-            // 2. Clean it using Groq AI
-            const cleanName = await extractMedicineName(rawText);
+            // Get extracted name directly from Gemini Vision
+            const cleanName = await processImageOCR(file);
             console.log("AI Extracted Name:", cleanName);
 
             if (cleanName) {
                 setQuery(cleanName);
                 onSearch(cleanName);
             } else {
-                // Fallback: Use the first 2-3 words of raw text if AI fails
-                const fallback = rawText.split(' ').slice(0, 2).join(' ');
-                setQuery(fallback);
-                onSearch(fallback);
-                alert("Could not identify exact medicine. Searching for: " + fallback);
+                alert("Could not identify exact medicine name from the image. Please try again with a clearer picture.");
             }
         } catch (error) {
             console.error(error);

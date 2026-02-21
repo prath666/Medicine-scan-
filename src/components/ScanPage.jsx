@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, ChevronLeft, Loader2, RefreshCw, ScanLine, Search } from 'lucide-react';
 import { processImageOCR } from '../utils/ocrProcessor';
-import { extractMedicineName } from '../services/groqService';
 
 const ScanPage = ({ onScanComplete, onBack }) => {
     const [isProcessing, setIsProcessing] = useState(false);
@@ -23,25 +22,14 @@ const ScanPage = ({ onScanComplete, onBack }) => {
         setExtractedName(null);
 
         try {
-            // 1. Get Raw Text
-            const text = await processImageOCR(file);
-
-            if (!text || text.length < 3) {
-                alert("Could not read text. Please try again with a clearer image.");
-                setIsProcessing(false);
-                setScannedImage(null);
-                return;
-            }
-
-            // 2. Extract Medicine Name
-            const cleanName = await extractMedicineName(text);
+            // Get extracted name directly from Gemini Vision
+            const cleanName = await processImageOCR(file);
 
             if (cleanName) {
                 setExtractedName(cleanName);
             } else {
-                // Fallback
-                const fallback = text.split(' ').slice(0, 2).join(' ');
-                setExtractedName(fallback);
+                alert("Could not identify exact medicine name from the image. Please try again with a clearer picture.");
+                setScannedImage(null);
             }
         } catch (error) {
             console.error(error);
